@@ -11,7 +11,8 @@ vars configure --project=PROJECT_ID --env=dev --path=/
 ```
 
 Use your existing Infisical project ID. Each device authenticates independently in the browser.
-Homebrew installs Python and the official Infisical CLI; no Agent or skill installer is required.
+Homebrew installs Python and includes a pinned official Infisical CLI inside the package.
+No separate Infisical Tap, global Infisical command, Agent, or skill installer is required.
 
 Fetch a value when a program needs it:
 
