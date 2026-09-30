@@ -1,8 +1,8 @@
 class Secrets < Formula
   desc "Manage Infisical secrets and inject them without a local value cache"
   homepage "https://github.com/AlexKaiqi/homebrew-tap"
-  url "https://github.com/AlexKaiqi/homebrew-tap/releases/download/secrets-v0.1.3/secrets-0.1.3.tar.gz"
-  sha256 "15758ab39abdb187c2bbee915915ff61da2cc6baa9ed00aaf7751469a8385186"
+  url "https://github.com/AlexKaiqi/homebrew-tap/releases/download/secrets-v0.2.0/secrets-0.2.0.tar.gz"
+  sha256 "f10d174e6d6b2ad887fcfcd72c30cb1ef56638b146f61253b18e15a62f021bf3"
 
   depends_on :macos
   depends_on "python@3.14"
@@ -19,40 +19,40 @@ class Secrets < Formula
   end
 
   def install
-    libexec.install "vars", "management.py", "test_vars.py", "test_management.py"
+    libexec.install "secrets", "management.py", "test_secrets.py", "test_management.py"
     python = formula_opt_bin("python@3.14")/"python3.14"
-    inreplace libexec/"vars", "#!/usr/bin/env python3", "#!#{python}"
+    inreplace libexec/"secrets", "#!/usr/bin/env python3", "#!#{python}"
     resource("infisical").stage do
       (libexec/"infisical").install "infisical"
       (pkgshare/"infisical").install "LICENSE" if File.exist?("LICENSE")
     end
-    (bin/"vars").write_env_script libexec/"vars",
+    (bin/"secrets").write_env_script libexec/"secrets",
                                 PATH: "#{libexec}/infisical:$PATH"
     pkgshare.install "CAPABILITY.md", "interface"
   end
 
   def caveats
     <<~EOS
-      Authenticate this Mac: vars login
+      Authenticate this Mac: secrets login
       Select your existing variable space:
-        vars configure --project=PROJECT_ID --env=dev --path=/
+        secrets configure --project=PROJECT_ID --env=dev --path=/
       Start a program with its required variables:
-        vars run --require=API_KEY -- python3 app.py
-      Command help: vars --help or vars run --help
+        secrets run --require=API_KEY -- python3 app.py
+      Command help: secrets --help or secrets run --help
       Usage documentation: #{pkgshare}/CAPABILITY.md
 
       Authentication stays in macOS Keychain. Business secret values are not cached.
-      Uninstalling keeps your session and location settings. Use vars logout first
+      Uninstalling keeps your session and location settings. Use secrets logout first
       if you also want to remove this device's login.
     EOS
   end
 
   test do
-    assert_equal "vars 0.1.3", shell_output("#{bin}/vars --version").strip
-    assert_match "get", shell_output("#{bin}/vars --help")
+    assert_equal "secrets 0.2.0", shell_output("#{bin}/secrets --version").strip
+    assert_match "get", shell_output("#{bin}/secrets --help")
     assert_match "0.43.137", shell_output("#{libexec}/infisical/infisical --version")
     with_env("HOME" => testpath.to_s, "PATH" => "/usr/bin:/bin") do
-      assert_equal "signed_out", JSON.parse(shell_output("#{bin}/vars status --json", 3)).fetch("state")
+      assert_equal "signed_out", JSON.parse(shell_output("#{bin}/secrets status --json", 3)).fetch("state")
     end
     system formula_opt_bin("python@3.14")/"python3.14", "-B", "-m", "unittest", "discover",
            "-s", libexec, "-p", "test_*.py"

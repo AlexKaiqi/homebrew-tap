@@ -6,8 +6,8 @@ Install the macOS command and its dependencies:
 
 ```sh
 brew install AlexKaiqi/tap/secrets
-vars login
-vars configure --project=PROJECT_ID --env=dev --path=/
+secrets login
+secrets configure --project=PROJECT_ID --env=dev --path=/
 ```
 
 Use your existing Infisical project ID. Each device authenticates independently in the browser.
@@ -18,7 +18,7 @@ Fetch a value when a program needs it:
 
 ```sh
 (
-  API_KEY="$(vars get API_KEY)" || exit "$?"
+  API_KEY="$(secrets get API_KEY)" || exit "$?"
   export API_KEY
   exec python3 app.py
 )
@@ -34,12 +34,12 @@ Upgrade or uninstall:
 ```sh
 brew update
 brew upgrade AlexKaiqi/tap/secrets
-vars --version
+secrets --version
 brew uninstall secrets
 ```
 
 Uninstalling preserves your session and location settings. To remove this device's session,
-run `vars logout` before uninstalling. Existing process environments are not revoked by logout.
+run `secrets logout` before uninstalling. Existing process environments are not revoked by logout.
 
 This package currently supports macOS. Every [release](https://github.com/AlexKaiqi/homebrew-tap/releases)
 includes the versioned source archive, tests, usage documentation and SHA-256 checksum.
