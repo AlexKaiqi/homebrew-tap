@@ -1,11 +1,11 @@
 # Personal Homebrew packages
 
-## Remote Variables
+## Secrets
 
 Install the macOS command and its dependencies:
 
 ```sh
-brew install AlexKaiqi/tap/remote-variables
+brew install AlexKaiqi/tap/secrets
 vars login
 vars configure --project=PROJECT_ID --env=dev --path=/
 ```
@@ -33,9 +33,9 @@ Upgrade or uninstall:
 
 ```sh
 brew update
-brew upgrade AlexKaiqi/tap/remote-variables
+brew upgrade AlexKaiqi/tap/secrets
 vars --version
-brew uninstall remote-variables
+brew uninstall secrets
 ```
 
 Uninstalling preserves your session and location settings. To remove this device's session,

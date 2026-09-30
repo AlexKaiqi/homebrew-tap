@@ -1,8 +1,8 @@
-class RemoteVariables < Formula
-  desc "Read individual Infisical variables without a local secret cache"
+class Secrets < Formula
+  desc "Manage Infisical secrets and inject them without a local value cache"
   homepage "https://github.com/AlexKaiqi/homebrew-tap"
-  url "https://github.com/AlexKaiqi/homebrew-tap/releases/download/remote-variables-v0.1.1/remote-variables-0.1.1.tar.gz"
-  sha256 "ad0ffd74596744ef6694a2bdb66c1325a6f50b9ea491b610e12550d148b2caa8"
+  url "https://github.com/AlexKaiqi/homebrew-tap/releases/download/secrets-v0.1.3/secrets-0.1.3.tar.gz"
+  sha256 "15758ab39abdb187c2bbee915915ff61da2cc6baa9ed00aaf7751469a8385186"
 
   depends_on :macos
   depends_on "python@3.14"
@@ -19,7 +19,7 @@ class RemoteVariables < Formula
   end
 
   def install
-    libexec.install "scripts/vars", "scripts/test_vars.py"
+    libexec.install "vars", "management.py", "test_vars.py", "test_management.py"
     python = formula_opt_bin("python@3.14")/"python3.14"
     inreplace libexec/"vars", "#!/usr/bin/env python3", "#!#{python}"
     resource("infisical").stage do
@@ -28,7 +28,7 @@ class RemoteVariables < Formula
     end
     (bin/"vars").write_env_script libexec/"vars",
                                 PATH: "#{libexec}/infisical:$PATH"
-    pkgshare.install "SKILL.md", "references", "agents"
+    pkgshare.install "CAPABILITY.md", "interface"
   end
 
   def caveats
@@ -36,7 +36,10 @@ class RemoteVariables < Formula
       Authenticate this Mac: vars login
       Select your existing variable space:
         vars configure --project=PROJECT_ID --env=dev --path=/
-      Read a value into a consumer: vars get NAME
+      Start a program with its required variables:
+        vars run --require=API_KEY -- python3 app.py
+      Command help: vars --help or vars run --help
+      Usage documentation: #{pkgshare}/CAPABILITY.md
 
       Authentication stays in macOS Keychain. Business secret values are not cached.
       Uninstalling keeps your session and location settings. Use vars logout first
@@ -45,13 +48,13 @@ class RemoteVariables < Formula
   end
 
   test do
-    assert_equal "vars 0.1.1", shell_output("#{bin}/vars --version").strip
+    assert_equal "vars 0.1.3", shell_output("#{bin}/vars --version").strip
     assert_match "get", shell_output("#{bin}/vars --help")
     assert_match "0.43.137", shell_output("#{libexec}/infisical/infisical --version")
     with_env("HOME" => testpath.to_s, "PATH" => "/usr/bin:/bin") do
       assert_equal "signed_out", JSON.parse(shell_output("#{bin}/vars status --json", 3)).fetch("state")
     end
     system formula_opt_bin("python@3.14")/"python3.14", "-B", "-m", "unittest", "discover",
-           "-s", libexec, "-p", "test_vars.py"
+           "-s", libexec, "-p", "test_*.py"
   end
 end
